@@ -1,27 +1,39 @@
-import { getAuth, sendSignInLinkToEmail } from "firebase/auth";
+import { getAuth, signInWithPopup } from 'firebase/auth';
+import { GoogleAuthProvider } from "firebase/auth";
+import { app } from '../../utils/firebase';
+
+const provider = new GoogleAuthProvider();
 
 export const SignIn = () => {
-  const auth = getAuth();
+  const auth = getAuth(app);
 
-    async function onSignIn() {
-        await sendSignInLinkToEmail(auth, email, actionCodeSettings)
-            .then(() => {
-                // The link was successfully sent. Inform the user.
-                // Save the email locally so you don't need to ask the user for it again
-                // if they open the link on the same device.
-                window.localStorage.setItem("emailForSignIn", email);
-                // ...
-            })
-            .catch((error) => {
-                const errorCode = error.code;
-                const errorMessage = error.message;
-                // ...
-        });
-    }
+  async function onSignIn() {
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        // This gives you a Google Access Token. You can use it to access the Google API.
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        if (!credential) {
+          return;
+        }
+        // The signed-in user info
+        const user = result.user;
+        console.log(user);  // Log the user info if necessary
+
+        // Handle token or any additional data you may need from the result
+        // const token = credential.accessToken;
+
+      }).catch((error) => {
+        // Handle Errors here.
+        console.error("Error during sign-in:", error.message);
+        // Log or handle the error as needed, without using unused variables
+      });
+  }
 
   return (
     <div>
-      <h1>Signup</h1>
+      <button onClick={onSignIn}>
+        Login with Google 
+      </button>
     </div>
   );
 };
