@@ -1,10 +1,13 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useEffect } from "react";
-import { SignIn } from "./components/signin";
+import { SignIn  } from "./components/signin";
 import { RecoilRoot, useRecoilState } from "recoil";
 import { userAtom } from "../store/atoms/user";
 import { Topbar } from "./components/topbar";
+import { Card } from "./components/card";
+import SubmissionActivity from "./components/submission";
+import { Leaderboard } from "./components/leaderboard";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDzOxSVa3JjtKd4jZmqiVuFHmv11XOItGw",
@@ -27,41 +30,46 @@ function App() {
 }
 
 function StoreApp() {
-   const [user, setUser] = useRecoilState(userAtom);
+  const [user, setUser] = useRecoilState(userAtom);
 
   useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, function (user) {
       if (user && user.email) {
         setUser({
           loading: false,
           user: {
             email: user.email,
-          }
-        })
-        console.log('This is the user', user);
+          },
+        });
       } else {
         setUser({
           loading: false,
-        })
-        console.log('There is no logged in user');
-        
+        });
+        // No user is signed in.
+        console.log("There is no logged in user");
       }
-  });
+    });
   }, []);
 
   if (user.loading) {
-    return <div className="text-center">loading...</div>;
+    return <div>loading ...</div>;
   }
 
   if (!user.user) {
-    return <div className="text-center"> <SignIn /> </div>;
+    return (
+      <div>
+        <Signin />
+      </div>
+    );
   }
 
-
   return (
-    <>
-      <Topbar />
-    </>
+    <div className="place-items-center grid">
+      <div className="max-w-screen-lg w-full">
+        <Topbar />
+        <Leaderboard />
+      </div>
+    </div>
   );
 }
 
